@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:we_chat/common/const.dart';
 import 'package:http/http.dart' as http;
 
+import 'home_find.dart';
 import 'home_model.dart';
 
 class HomeRoot extends StatefulWidget {
@@ -83,6 +84,7 @@ class _HomeRootState extends State<HomeRoot>
         });
   }
 
+  //获取数据
   Future<List<HomeModel>> _getDatas() async {
     _cancelConnect = false;
     final response = await http
@@ -103,44 +105,91 @@ class _HomeRootState extends State<HomeRoot>
     super.build(context);
     return Container(
       child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: WeChatThemColor,
-            title: Text('微信'),
-            centerTitle: true,
-            actions: <Widget>[
-              Container(
-                padding: EdgeInsets.only(right: 10),
-                child: PopupMenuButton(
-                  offset: Offset(0, 60),
-                  child: Image(
-                    image: AssetImage('images/圆加.png'),
-                    width: 25,
-                    color: Colors.white,
-                  ),
-                  itemBuilder: _buildPopupMenuItem, //需要一个回调，不是调用一个方法
+        appBar: AppBar(
+          backgroundColor: WeChatThemColor,
+          title: Text('微信'),
+          centerTitle: true,
+          actions: <Widget>[
+            Container(
+              padding: EdgeInsets.only(right: 10),
+              child: PopupMenuButton(
+                offset: Offset(0, 60),
+                child: Image(
+                  image: AssetImage('images/圆加.png'),
+                  width: 25,
+                  color: Colors.white,
+                ),
+                itemBuilder: _buildPopupMenuItem, //需要一个回调，不是调用一个方法
+              ),
+            ),
+          ],
+        ),
+        body: _getBodyView(_datas),
+      ),
+    );
+  }
+}
+
+Widget _getBodyView(List<HomeModel> _datas) {
+  if (_datas.length == 0) {
+    //没有数据加载loading 页面
+    return Center(child: Text('loading...'));
+  } else {
+    return ListView.builder(
+      //在头部多加一个搜索功能的view
+      itemCount: _datas.length + 1,
+      itemBuilder: (BuildContext context, int index) {
+        if (index == 0) {
+          //搜索条
+          return Container(
+            height: 50,
+            color: WeChatThemColor,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (BuildContext context) {
+                    return HomeFind();
+                  }),
+                );
+              },
+              child: Container(
+                margin: EdgeInsets.only(left: 5, right: 5, top: 10, bottom: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  color: Colors.white,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Image(
+                      image: AssetImage('images/放大镜b.png'),
+                      width: 18,
+                      color: WeChatThemColor,
+                    ),
+                    SizedBox(width: 5),
+                    Text(
+                      '搜索',
+                      style: TextStyle(color: WeChatThemColor, fontSize: 15),
+                    )
+                  ],
                 ),
               ),
-            ],
-          ),
-          body: _datas.length == 0
-              ? Center(
-                  child: Text('loading...'),
-                )
-              : ListView.builder(
-                  itemCount: _datas.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return ListTile(
-                      title: Text(_datas[index].name),
-                      subtitle: Text(
-                        _datas[index].msg,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(_datas[index].imgUrl),
-                      ),
-                    );
-                  },
-                )),
+            ),
+          );
+        } else {
+          //cell
+          return ListTile(
+            title: Text(_datas[index - 1].name),
+            subtitle: Text(
+              _datas[index - 1].msg,
+              overflow: TextOverflow.ellipsis,
+            ),
+            leading: CircleAvatar(
+              backgroundImage: NetworkImage(_datas[index - 1].imgUrl),
+            ),
+          );
+        }
+      },
     );
   }
 }
