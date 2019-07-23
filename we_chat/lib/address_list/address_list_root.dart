@@ -9,7 +9,8 @@ class AddressListRoot extends StatefulWidget {
   _AddressListRootState createState() => _AddressListRootState();
 }
 
-class _AddressListRootState extends State<AddressListRoot> {
+class _AddressListRootState extends State<AddressListRoot>
+    with AutomaticKeepAliveClientMixin<AddressListRoot> {
   //列表数据
   final List<AddressListModel> _listDatas = [];
   ScrollController _scrollController;
@@ -22,6 +23,9 @@ class _AddressListRootState extends State<AddressListRoot> {
 
   //记录滚动位置
   double _groupOffset = 54.0 * 4;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -96,6 +100,7 @@ class _AddressListRootState extends State<AddressListRoot> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Container(
       child: Scaffold(
         appBar: AppBar(

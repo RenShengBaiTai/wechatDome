@@ -40,32 +40,47 @@ List<PopupMenuItem<String>> _buildPopupMenuItem(BuildContext context) {
   ];
 }
 
-class _HomeRootState extends State<HomeRoot> {
+//with 混入
+//AutomaticKeepAliveClientMixin 这个类可以保存状态，不希望每次打开页面重新请求网络，
+//步骤：
+//1.with AutomaticKeepAliveClientMixin<T>
+//2.重写wantKeepAlive => true;
+//3.调用super.build(context);
+class _HomeRootState extends State<HomeRoot>
+    with AutomaticKeepAliveClientMixin<HomeRoot> {
   List<HomeModel> _datas = [];
+
   //控制是否超时
   bool _cancelConnect = false;
+
+  //是否保存状态
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
 
     //也可以try cache
-    _getDatas().then((datas) {
-
-      if(!_cancelConnect){
-
-        setState(() {
-          _datas = datas;
+    _getDatas()
+        .then((datas) {
+          if (!_cancelConnect) {
+            setState(() {
+              _datas = datas;
+            });
+          }
+        })
+        .catchError((error) {
+          print(error);
+        })
+        .whenComplete(() {
+          print('完毕！');
+        })
+        .timeout(Duration(seconds: 10))
+        .catchError((error) {
+          print('超时！');
+          _cancelConnect = true;
         });
-      }
-    }).catchError((error) {
-      print(error);
-    }).whenComplete(() {
-      print('完毕！');
-    }).timeout(Duration(seconds: 10)).catchError((error) {
-      print('超时！');
-      _cancelConnect = true;
-    });
   }
 
   Future<List<HomeModel>> _getDatas() async {
@@ -76,7 +91,7 @@ class _HomeRootState extends State<HomeRoot> {
       final _responseBody = json.decode(response.body);
       List _list = _responseBody['list'];
       List<HomeModel> _homeList =
-      _list.map((item) => HomeModel.fromJson(item)).toList();
+          _list.map((item) => HomeModel.fromJson(item)).toList();
       return _homeList;
     } else {
       throw Exception('statusCode:${response.statusCode}');
@@ -85,6 +100,7 @@ class _HomeRootState extends State<HomeRoot> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Container(
       child: Scaffold(
           appBar: AppBar(
@@ -108,23 +124,23 @@ class _HomeRootState extends State<HomeRoot> {
           ),
           body: _datas.length == 0
               ? Center(
-            child: Text('loading...'),
-          )
+                  child: Text('loading...'),
+                )
               : ListView.builder(
-            itemCount: _datas.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                title: Text(_datas[index].name),
-                subtitle: Text(
-                  _datas[index].msg,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                leading: CircleAvatar(
-                  backgroundImage: NetworkImage(_datas[index].imgUrl),
-                ),
-              );
-            },
-          )),
+                  itemCount: _datas.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(
+                      title: Text(_datas[index].name),
+                      subtitle: Text(
+                        _datas[index].msg,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage(_datas[index].imgUrl),
+                      ),
+                    );
+                  },
+                )),
     );
   }
 }

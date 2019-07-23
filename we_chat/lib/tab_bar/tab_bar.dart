@@ -11,14 +11,16 @@ class TabBarControl extends StatefulWidget {
 }
 
 class _TabBarControlState extends State<TabBarControl> {
+  final PageController _pageController = PageController(initialPage: 0);
 
   int _currentIndex = 0;
-  List<Widget> _pages = [
-    HomeRoot(),
-    AddressListRoot(),
-    FindRoot(),
-    MyRoot(),
-  ];
+
+//  List<Widget> _pages = [
+//    HomeRoot(),
+//    AddressListRoot(),
+//    FindRoot(),
+//    MyRoot(),
+//  ];
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +35,27 @@ class _TabBarControlState extends State<TabBarControl> {
             onTap: (int index) {
               _currentIndex = index;
               setState(() {});
-            },//tap
+              _pageController.jumpToPage(index);
+            },
+            //tap
             items: <BottomNavigationBarItem>[
-              TabBarItem('微信'  ,'tabbar_chat'),
-              TabBarItem('通讯录','tabbar_friends'),
-              TabBarItem('发现'  ,'tabbar_discover'),
-              TabBarItem('我的'  ,'tabbar_mine'),
+              TabBarItem('微信', 'tabbar_chat'),
+              TabBarItem('通讯录', 'tabbar_friends'),
+              TabBarItem('发现', 'tabbar_discover'),
+              TabBarItem('我的', 'tabbar_mine'),
             ]),
-        body: _pages[_currentIndex],
+//        body: _pages[_currentIndex],
+        body: PageView(//默认可以滑动切换
+          //禁止滑动
+          physics: NeverScrollableScrollPhysics(),
+          controller: _pageController,
+          children: <Widget>[
+            HomeRoot(),
+            AddressListRoot(),
+            FindRoot(),
+            MyRoot(),
+          ],
+        ),
       ),
     );
   }
