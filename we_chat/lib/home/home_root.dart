@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:we_chat/common/const.dart';
 import 'package:http/http.dart' as http;
 
-import 'home_find.dart';
+import 'home_find_cell.dart';
 import 'home_model.dart';
 
 class HomeRoot extends StatefulWidget {
@@ -141,41 +141,7 @@ Widget _getBodyView(List<HomeModel> _datas) {
       itemBuilder: (BuildContext context, int index) {
         if (index == 0) {
           //搜索条
-          return Container(
-            height: 50,
-            color: WeChatThemColor,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (BuildContext context) {
-                    return HomeFind();
-                  }),
-                );
-              },
-              child: Container(
-                margin: EdgeInsets.only(left: 5, right: 5, top: 10, bottom: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  color: Colors.white,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Image(
-                      image: AssetImage('images/放大镜b.png'),
-                      width: 18,
-                      color: WeChatThemColor,
-                    ),
-                    SizedBox(width: 5),
-                    Text(
-                      '搜索',
-                      style: TextStyle(color: WeChatThemColor, fontSize: 15),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          );
+          return HomeFindCell(datas: _datas,);
         } else {
           //cell
           return ListTile(
